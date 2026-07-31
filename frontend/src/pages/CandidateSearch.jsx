@@ -172,7 +172,7 @@ const CandidateSearch = () => {
               {/* Score range */}
               <div className="w-full md:max-w-md space-y-2">
                 <div className="flex justify-between items-center text-sm font-semibold">
-                  <span className="text-on-surface-variant dark:text-slate-400">Minimum AI Suitability Score</span>
+                  <span className="text-on-surface-variant dark:text-slate-400">Minimum AI Talent Score</span>
                   <span className="text-primary font-bold">{score}% Match</span>
                 </div>
                 <input

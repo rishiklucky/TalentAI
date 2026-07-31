@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { candidateAPI, shortlistAPI } from '../services/api';
 import { 
-  FiUsers, FiTrendingUp, FiHeart, FiBriefcase, FiArrowRight, FiCheck, FiMapPin, FiCpu, FiBookmark 
+  FiUsers, FiTrendingUp, FiHeart, FiBriefcase, FiArrowRight, FiCheck, FiMapPin, FiCpu, FiBookmark, FiX 
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -190,7 +190,7 @@ const RecruiterDashboard = () => {
                     <tr className="border-b border-outline-variant/20 text-outline dark:text-slate-400 font-semibold font-label-caps text-xs uppercase tracking-wider">
                       <th className="pb-3">Candidate</th>
                       <th className="pb-3">Location</th>
-                      <th className="pb-3">AI Suitability</th>
+                      <th className="pb-3">AI Talent Score</th>
                       <th className="pb-3 text-right">Action</th>
                     </tr>
                   </thead>

@@ -275,13 +275,13 @@ const CandidateProfile = () => {
 
               </div>
 
-              {/* Right Column - Suitability Index */}
+              {/* Right Column - AI Talent Score */}
               <div className="space-y-gutter">
                 
                 {/* Radial suitability */}
                 <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-outline-variant/20 flex flex-col items-center justify-center text-center space-y-6">
                   <h3 className="font-headline-sm text-base font-bold text-outline dark:text-slate-400 uppercase tracking-widest">
-                    Suitability Index
+                    AI Talent Score
                   </h3>
                   
                   {/* Gauge */}
