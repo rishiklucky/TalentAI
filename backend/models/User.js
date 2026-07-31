@@ -29,6 +29,8 @@ const userSchema = new mongoose.Schema({
   yearsOfExperience: { type: Number, default: 0 },
   bio: { type: String },
   avatar: { type: String },
+  resumeFile: { type: String },
+  resumeFileName: { type: String },
   education: { type: [educationSchema], default: [] },
   experience: { type: [experienceSchema], default: [] }
 }, {

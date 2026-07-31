@@ -34,7 +34,9 @@ export const resumeAPI = {
       'Content-Type': 'multipart/form-data'
     }
   }),
-  getAnalysis: () => API.get('/resume/analysis')
+  getAnalysis: () => API.get('/resume/analysis'),
+  viewOwn: () => API.get('/resume/view', { responseType: 'blob' }),
+  viewCandidate: (userId) => API.get(`/resume/view/${userId}`, { responseType: 'blob' })
 };
 
 // Recruiter Candidate queries

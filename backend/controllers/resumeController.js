@@ -56,6 +56,8 @@ const uploadAndAnalyzeResume = async (req, res) => {
       user.title = aiAnalysis.title || user.title;
       user.location = aiAnalysis.location || user.location;
       user.bio = aiAnalysis.bio || user.bio;
+      user.resumeFile = req.file.buffer.toString('base64');
+      user.resumeFileName = req.file.originalname;
       
       if (aiAnalysis.education && aiAnalysis.education.length > 0) {
         user.education = aiAnalysis.education;
@@ -78,7 +80,8 @@ const uploadAndAnalyzeResume = async (req, res) => {
         location: user.location,
         bio: user.bio,
         education: user.education,
-        experience: user.experience
+        experience: user.experience,
+        resumeFileName: user.resumeFileName
       }
     });
 
@@ -103,7 +106,45 @@ const getResumeAnalysis = async (req, res) => {
   }
 };
 
+// @desc    Download/View User's Own Resume
+// @route   GET /api/resume/view
+// @access  Private (Student)
+const viewOwnResume = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user || !user.resumeFile) {
+      return res.status(404).json({ message: 'No resume file uploaded yet.' });
+    }
+    const pdfBuffer = Buffer.from(user.resumeFile, 'base64');
+    res.contentType('application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${user.resumeFileName || 'resume.pdf'}"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Download/View Candidate Resume for Recruiters/Users
+// @route   GET /api/resume/view/:userId
+// @access  Private (Authenticated)
+const viewCandidateResume = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user || !user.resumeFile) {
+      return res.status(404).json({ message: 'No resume file found for this candidate.' });
+    }
+    const pdfBuffer = Buffer.from(user.resumeFile, 'base64');
+    res.contentType('application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${user.resumeFileName || 'resume.pdf'}"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   uploadAndAnalyzeResume,
-  getResumeAnalysis
+  getResumeAnalysis,
+  viewOwnResume,
+  viewCandidateResume
 };

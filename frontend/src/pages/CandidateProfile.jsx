@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
-import { candidateAPI, shortlistAPI } from '../services/api';
+import { candidateAPI, shortlistAPI, resumeAPI } from '../services/api';
 import { 
   FiMapPin, FiCpu, FiGithub, FiLink, FiCheck, FiChevronDown, FiAlertCircle, FiArrowLeft, FiHeart, FiBriefcase, FiBookOpen 
 } from 'react-icons/fi';
@@ -48,6 +48,18 @@ const CandidateProfile = () => {
     }
   };
 
+  const handleViewResume = async () => {
+    try {
+      const res = await resumeAPI.viewCandidate(id);
+      const file = new Blob([res.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to open candidate resume document.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-background text-on-background dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
@@ -78,17 +90,25 @@ const CandidateProfile = () => {
             <Link to="/candidates" className="text-sm font-bold text-outline dark:text-slate-400 hover:text-primary transition-colors flex items-center gap-2">
               <FiArrowLeft /> Back to Candidates
             </Link>
-            <button
-              onClick={handleToggleShortlist}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
-                candidate.isShortlisted 
-                  ? 'bg-error-container/10 border border-error/20 text-error hover:bg-error-container/20' 
-                  : 'bg-primary text-on-primary hover:shadow-lg active:scale-95 duration-150'
-              }`}
-            >
-              <FiHeart className={candidate.isShortlisted ? 'fill-current' : ''} />
-              {candidate.isShortlisted ? 'Shortlisted' : 'Shortlist Candidate'}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleViewResume}
+                className="px-5 py-2.5 border border-outline-variant/60 dark:border-slate-700 text-on-background dark:text-slate-200 rounded-xl font-bold text-sm hover:bg-surface-container-high transition-all flex items-center gap-2"
+              >
+                <FiBookOpen /> View Resume
+              </button>
+              <button
+                onClick={handleToggleShortlist}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+                  candidate.isShortlisted 
+                    ? 'bg-error-container/10 border border-error/20 text-error hover:bg-error-container/20' 
+                    : 'bg-primary text-on-primary hover:shadow-lg active:scale-95 duration-150'
+                }`}
+              >
+                <FiHeart className={candidate.isShortlisted ? 'fill-current' : ''} />
+                {candidate.isShortlisted ? 'Shortlisted' : 'Shortlist Candidate'}
+              </button>
+            </div>
           </div>
 
           {/* Header Title Card */}

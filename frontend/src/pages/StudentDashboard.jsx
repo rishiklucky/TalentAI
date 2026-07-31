@@ -32,6 +32,18 @@ const StudentDashboard = () => {
     fetchAnalysis();
   }, []);
 
+  const handleViewResume = async () => {
+    try {
+      const res = await resumeAPI.viewOwn();
+      const file = new Blob([res.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to open resume document.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-background text-on-background dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
@@ -83,20 +95,32 @@ const StudentDashboard = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-4">
-                {user?.github && (
-                  <a href={user.github} target="_blank" rel="noreferrer" className="p-3 bg-surface-container dark:bg-slate-800 rounded-xl hover:text-primary transition-all">
-                    <FiGithub className="text-xl" />
-                  </a>
-                )}
-                {user?.portfolio && (
-                  <a href={user.portfolio} target="_blank" rel="noreferrer" className="p-3 bg-surface-container dark:bg-slate-800 rounded-xl hover:text-primary transition-all">
-                    <FiLink className="text-xl" />
-                  </a>
-                )}
-                <Link to="/upload" className="bg-primary text-on-primary px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2">
-                  <FiPlus /> {analysis ? 'Re-upload Resume' : 'Analyze Resume'}
-                </Link>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex items-center gap-3 justify-center sm:justify-start">
+                  {user?.github && (
+                    <a href={user.github} target="_blank" rel="noreferrer" className="p-3 bg-surface-container dark:bg-slate-800 rounded-xl hover:text-primary transition-all">
+                      <FiGithub className="text-xl" />
+                    </a>
+                  )}
+                  {user?.portfolio && (
+                    <a href={user.portfolio} target="_blank" rel="noreferrer" className="p-3 bg-surface-container dark:bg-slate-800 rounded-xl hover:text-primary transition-all">
+                      <FiLink className="text-xl" />
+                    </a>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {analysis && (
+                    <button 
+                      onClick={handleViewResume}
+                      className="border border-outline-variant/60 dark:border-slate-700 text-on-background dark:text-slate-200 px-6 py-3 rounded-xl font-bold hover:bg-surface-container-high transition-all flex items-center justify-center gap-2"
+                    >
+                      <FiBookOpen /> View Resume
+                    </button>
+                  )}
+                  <Link to="/upload" className="bg-primary text-on-primary px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <FiPlus /> {analysis ? 'Re-upload Resume' : 'Analyze Resume'}
+                  </Link>
+                </div>
               </div>
             </div>
 
