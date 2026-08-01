@@ -17,6 +17,10 @@ import CandidateProfile from './pages/CandidateProfile';
 import ShortlistedCandidates from './pages/ShortlistedCandidates';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import ResumeOptimizer from './pages/ResumeOptimizer';
+import CareerRoadmap from './pages/CareerRoadmap';
+import JobMatching from './pages/JobMatching';
+import CandidateComparison from './pages/CandidateComparison';
 
 // Private Route Wrapper
 const PrivateRoute = ({ children }) => {
@@ -90,6 +94,22 @@ function AppContent() {
             </RoleRoute>
           } 
         />
+        <Route 
+          path="/resume-optimizer" 
+          element={
+            <RoleRoute allowedRoles={['student']}>
+              <ResumeOptimizer />
+            </RoleRoute>
+          } 
+        />
+        <Route 
+          path="/career-roadmap" 
+          element={
+            <RoleRoute allowedRoles={['student']}>
+              <CareerRoadmap />
+            </RoleRoute>
+          } 
+        />
 
         {/* Recruiter Protected Routes */}
         <Route 
@@ -129,6 +149,22 @@ function AppContent() {
           element={
             <RoleRoute allowedRoles={['recruiter']}>
               <Analytics />
+            </RoleRoute>
+          } 
+        />
+        <Route 
+          path="/job-matching" 
+          element={
+            <RoleRoute allowedRoles={['recruiter']}>
+              <JobMatching />
+            </RoleRoute>
+          } 
+        />
+        <Route 
+          path="/candidate-comparison" 
+          element={
+            <RoleRoute allowedRoles={['recruiter']}>
+              <CandidateComparison />
             </RoleRoute>
           } 
         />

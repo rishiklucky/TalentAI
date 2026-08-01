@@ -82,6 +82,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const upgradeToPremium = async (couponCode) => {
+    setLoading(true);
+    try {
+      const res = await authAPI.upgrade({ couponCode });
+      const stored = localStorage.getItem('userInfo');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        parsed.subscription = res.data.subscription;
+        localStorage.setItem('userInfo', JSON.stringify(parsed));
+      }
+      setUser(res.data);
+      setLoading(false);
+      return res.data;
+    } catch (error) {
+      setLoading(false);
+      throw error.response?.data?.message || 'Failed to upgrade subscription';
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -91,7 +110,9 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         updateProfile,
+        upgradeToPremium,
         isAuthenticated: !!user,
+        isPremium: user?.subscription === 'PREMIUM',
         isRecruiter: user?.role === 'recruiter',
         isStudent: user?.role === 'student'
       }}

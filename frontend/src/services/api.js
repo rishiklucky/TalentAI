@@ -24,7 +24,16 @@ export const authAPI = {
   login: (data) => API.post('/auth/login', data),
   register: (data) => API.post('/auth/register', data),
   getProfile: () => API.get('/auth/profile'),
-  updateProfile: (data) => API.put('/auth/profile', data)
+  updateProfile: (data) => API.put('/auth/profile', data),
+  upgrade: (data) => API.post('/auth/upgrade', data)
+};
+
+// Premium Service calls
+export const premiumAPI = {
+  optimizeResume: (data) => API.post('/premium/optimize-resume', data),
+  careerRoadmap: (data) => API.post('/premium/career-roadmap', data),
+  jobMatch: (data) => API.post('/premium/job-match', data),
+  compareCandidates: (data) => API.post('/premium/compare-candidates', data)
 };
 
 // Resume Service calls

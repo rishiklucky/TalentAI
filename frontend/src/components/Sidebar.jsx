@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  FiGrid, FiUsers, FiCalendar, FiHeart, FiBarChart2, FiHelpCircle, FiLogOut, FiUploadCloud, FiSettings, FiUser 
+  FiGrid, FiUsers, FiCalendar, FiHeart, FiBarChart2, FiHelpCircle, FiLogOut, FiUploadCloud, FiSettings, FiUser, FiAward, FiLock, FiCpu, FiCompass
 } from 'react-icons/fi';
+import PremiumUpgradeModal from './PremiumUpgradeModal';
 
 const Sidebar = () => {
-  const { logout, isRecruiter, user } = useAuth();
+  const { logout, isRecruiter, isPremium, user } = useAuth();
   const navigate = useNavigate();
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -19,12 +21,16 @@ const Sidebar = () => {
     { name: 'Candidates', path: '/candidates', icon: <FiUsers /> },
     { name: 'Shortlisted', path: '/shortlisted', icon: <FiHeart /> },
     { name: 'Analytics', path: '/analytics', icon: <FiBarChart2 /> },
+    { name: 'Job Matching', path: '/job-matching', icon: <FiCpu />, premium: true },
+    { name: 'Candidate Comparison', path: '/candidate-comparison', icon: <FiBarChart2 />, premium: true },
     { name: 'Settings', path: '/settings', icon: <FiSettings /> },
   ];
 
   const studentLinks = [
     { name: 'My Profile', path: '/dashboard', icon: <FiUser /> },
     { name: 'Upload Resume', path: '/upload', icon: <FiUploadCloud /> },
+    { name: 'Resume Optimizer', path: '/resume-optimizer', icon: <FiCpu />, premium: true },
+    { name: 'Career Roadmap', path: '/career-roadmap', icon: <FiCompass />, premium: true },
     { name: 'Settings', path: '/settings', icon: <FiSettings /> },
   ];
 
@@ -39,31 +45,56 @@ const Sidebar = () => {
           {isRecruiter ? <FiUsers /> : <FiUser />}
         </div>
         <div>
-          <h2 className="font-headline-sm text-sm font-extrabold text-primary dark:text-inverse-primary leading-none">
+          <h2 className="font-headline-sm text-sm font-extrabold text-primary dark:text-inverse-primary leading-none flex items-center gap-1">
             {isRecruiter ? 'Recruiter Portal' : 'Student Portal'}
           </h2>
           <p className="text-[10px] font-label-caps text-outline dark:text-slate-400 uppercase tracking-widest mt-1">
-            {isRecruiter ? 'Enterprise Tier' : 'Talent Pool'}
+            {isPremium ? 'Premium Tier' : 'Talent Pool'}
           </p>
         </div>
       </div>
 
       {/* Nav Links */}
       <nav className="flex-1 flex flex-col gap-1">
-        {links.map((link) => (
-          <NavLink
-            key={link.path}
-            to={link.path}
-            className={({ isActive }) => `flex items-center gap-3 px-4 py-3 transition-all rounded-lg group text-body-md ${
-              isActive 
-                ? 'bg-primary/5 dark:bg-primary-container/20 text-primary dark:text-primary-fixed-dim border-l-4 border-primary font-semibold' 
-                : 'text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800'
-            }`}
-          >
-            <span className="text-lg group-hover:translate-x-1 duration-200">{link.icon}</span>
-            <span>{link.name}</span>
-          </NavLink>
-        ))}
+        {links.map((link) => {
+          const isLocked = link.premium && !isPremium;
+
+          if (isLocked) {
+            return (
+              <button
+                key={link.path}
+                onClick={() => setUpgradeModalOpen(true)}
+                className="w-full flex items-center gap-3 px-4 py-3 transition-all rounded-lg group text-body-md text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800 text-left"
+              >
+                <span className="text-lg group-hover:translate-x-1 duration-200 text-outline">{link.icon}</span>
+                <span>{link.name}</span>
+                <span className="ml-auto text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold font-label-caps">
+                  <FiLock className="text-[10px]" /> PRO
+                </span>
+              </button>
+            );
+          }
+
+          return (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              className={({ isActive }) => `flex items-center gap-3 px-4 py-3 transition-all rounded-lg group text-body-md ${
+                isActive 
+                  ? 'bg-primary/5 dark:bg-primary-container/20 text-primary dark:text-primary-fixed-dim border-l-4 border-primary font-semibold' 
+                  : 'text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800'
+              }`}
+            >
+              <span className="text-lg group-hover:translate-x-1 duration-200">{link.icon}</span>
+              <span>{link.name}</span>
+              {link.premium && (
+                <span className="ml-auto text-[10px] bg-gradient-primary text-white px-1.5 py-0.5 rounded flex items-center gap-1 font-bold font-label-caps shadow-sm">
+                  PRO
+                </span>
+              )}
+            </NavLink>
+          );
+        })}
       </nav>
 
       {/* Bottom Footer Actions */}
@@ -89,6 +120,11 @@ const Sidebar = () => {
           <span className="text-error">Sign Out</span>
         </button>
       </div>
+
+      <PremiumUpgradeModal 
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+      />
     </aside>
   );
 };

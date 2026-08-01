@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Coupon = require('../models/Coupon');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
@@ -36,6 +37,7 @@ const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        subscription: user.subscription,
         token: generateToken(user._id)
       });
     } else {
@@ -61,6 +63,7 @@ const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        subscription: user.subscription,
         token: generateToken(user._id)
       });
     } else {
@@ -119,6 +122,7 @@ const updateUserProfile = async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
+        subscription: updatedUser.subscription,
         college: updatedUser.college,
         skills: updatedUser.skills,
         github: updatedUser.github,
@@ -140,9 +144,61 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Upgrade user subscription to PREMIUM (optionally using a coupon code)
+// @route   POST /api/auth/upgrade
+// @access  Private
+const upgradeSubscription = async (req, res) => {
+  const { couponCode } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If couponCode is provided, validate it
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode });
+      if (!coupon) {
+        return res.status(400).json({ message: 'Invalid coupon code' });
+      }
+      if (!coupon.isActive) {
+        return res.status(400).json({ message: 'This coupon is deactivated/expired' });
+      }
+    }
+
+    // Upgrade user
+    user.subscription = 'PREMIUM';
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      subscription: updatedUser.subscription,
+      college: updatedUser.college,
+      skills: updatedUser.skills,
+      github: updatedUser.github,
+      portfolio: updatedUser.portfolio,
+      title: updatedUser.title,
+      location: updatedUser.location,
+      yearsOfExperience: updatedUser.yearsOfExperience,
+      bio: updatedUser.bio,
+      avatar: updatedUser.avatar,
+      education: updatedUser.education,
+      experience: updatedUser.experience,
+      token: generateToken(updatedUser._id)
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  upgradeSubscription
 };

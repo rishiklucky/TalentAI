@@ -7,9 +7,21 @@ const authRoutes = require('./routes/authRoutes');
 const resumeRoutes = require('./routes/resumeRoutes');
 const candidateRoutes = require('./routes/candidateRoutes');
 const shortlistRoutes = require('./routes/shortlistRoutes');
+const premiumRoutes = require('./routes/premiumRoutes');
 
-// Initialize database
-connectDB();
+// Initialize database & Seed coupon
+connectDB().then(async () => {
+  try {
+    const Coupon = require('./models/Coupon');
+    const existing = await Coupon.findOne({ code: 'TalentAI' });
+    if (!existing) {
+      await Coupon.create({ code: 'TalentAI', isActive: true });
+      console.log('Seeded coupon code "TalentAI" successfully.');
+    }
+  } catch (err) {
+    console.error('Error seeding coupon code:', err);
+  }
+});
 
 const app = express();
 
@@ -23,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/shortlist', shortlistRoutes);
+app.use('/api/premium', premiumRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {

@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
   resumeFile: { type: String },
   resumeFileName: { type: String },
   education: { type: [educationSchema], default: [] },
-  experience: { type: [experienceSchema], default: [] }
+  experience: { type: [experienceSchema], default: [] },
+  subscription: { type: String, enum: ['FREE', 'PREMIUM'], default: 'FREE' }
 }, {
   timestamps: true
 });

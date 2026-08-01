@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { FiMenu, FiX, FiSun, FiMoon, FiBell, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon, FiBell, FiSettings, FiLogOut, FiAward } from 'react-icons/fi';
+import PremiumUpgradeModal from './PremiumUpgradeModal';
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated, isRecruiter, isStudent } = useAuth();
+  const { user, logout, isAuthenticated, isRecruiter, isStudent, isPremium } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -89,25 +91,50 @@ const Navbar = () => {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2 focus:outline-none"
                 >
-                  {user?.avatar ? (
-                    <img 
-                      className="w-10 h-10 rounded-full border border-outline-variant/30 object-cover" 
-                      src={user.avatar} 
-                      alt={user.name} 
-                    />
-                  ) : (
-                    <div className="h-10 w-10 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-sm">
-                      {getInitials(user?.name)}
-                    </div>
-                  )}
+                  <div className="relative">
+                    {user?.avatar ? (
+                      <img 
+                        className="w-10 h-10 rounded-full border border-outline-variant/30 object-cover" 
+                        src={user.avatar} 
+                        alt={user.name} 
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-sm">
+                        {getInitials(user?.name)}
+                      </div>
+                    )}
+                    {isPremium && (
+                      <span className="absolute -bottom-1 -right-1 bg-gradient-primary text-white p-0.5 rounded-full border border-white dark:border-slate-900 shadow-md">
+                        <FiAward className="text-[10px]" />
+                      </span>
+                    )}
+                  </div>
                 </button>
 
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl py-2 border border-outline-variant/30 z-50">
+                  <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-xl py-2 border border-outline-variant/30 z-50">
                     <div className="px-4 py-2 border-b border-outline-variant/20">
-                      <p className="font-semibold text-sm text-on-background dark:text-white truncate">{user?.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-semibold text-sm text-on-background dark:text-white truncate">{user?.name}</p>
+                        {isPremium && (
+                          <span className="bg-gradient-primary text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">PRO</span>
+                        )}
+                      </div>
                       <p className="text-xs text-outline dark:text-slate-400 capitalize">{user?.role}</p>
                     </div>
+                    
+                    {!isPremium && (
+                      <button 
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setUpgradeModalOpen(true);
+                        }}
+                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-slate-700 font-bold transition-colors"
+                      >
+                        <FiAward className="text-secondary" /> Upgrade to Premium
+                      </button>
+                    )}
+
                     <Link 
                       to={isRecruiter ? "/recruiter" : "/dashboard"} 
                       onClick={() => setProfileDropdownOpen(false)}
@@ -189,6 +216,11 @@ const Navbar = () => {
           )}
         </div>
       )}
+      {/* Premium Upgrade Modal */}
+      <PremiumUpgradeModal 
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+      />
     </nav>
   );
 };
