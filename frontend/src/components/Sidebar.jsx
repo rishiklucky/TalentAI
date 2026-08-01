@@ -37,7 +37,7 @@ const Sidebar = () => {
   const links = isRecruiter ? recruiterLinks : studentLinks;
 
   return (
-    <aside className="bg-surface dark:bg-slate-900 h-[calc(100vh-80px)] w-64 fixed left-0 top-20 border-r border-outline-variant/20 shadow-md flex flex-col p-stack-md pt-8 hidden md:flex transition-colors duration-300">
+    <aside className="bg-surface dark:bg-slate-900 h-[calc(100vh-80px)] w-64 fixed left-0 top-20 border-r border-outline-variant/20 shadow-md flex flex-col p-stack-md pt-8 hidden md:flex transition-colors duration-300 z-30">
       
       {/* Recruiter / Student Title Card */}
       <div className="flex items-center gap-3 mb-8 px-2">

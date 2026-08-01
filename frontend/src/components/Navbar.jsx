@@ -24,7 +24,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-surface/70 dark:bg-slate-900/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm sticky top-0 z-50 transition-all duration-300">
+    <>
+      <nav className="bg-surface/70 dark:bg-slate-900/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm sticky top-0 z-50 transition-all duration-300">
       <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
         
         {/* Logo */}
@@ -216,12 +217,13 @@ const Navbar = () => {
           )}
         </div>
       )}
+    </nav>
       {/* Premium Upgrade Modal */}
       <PremiumUpgradeModal 
         isOpen={upgradeModalOpen}
         onClose={() => setUpgradeModalOpen(false)}
       />
-    </nav>
+    </>
   );
 };
 

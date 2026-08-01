@@ -158,7 +158,8 @@ const upgradeSubscription = async (req, res) => {
 
     // If couponCode is provided, validate it
     if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode });
+      const escapedCode = couponCode.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const coupon = await Coupon.findOne({ code: { $regex: new RegExp('^' + escapedCode + '$', 'i') } });
       if (!coupon) {
         return res.status(400).json({ message: 'Invalid coupon code' });
       }
