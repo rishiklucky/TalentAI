@@ -5,7 +5,7 @@ TalentAI is a production-quality, responsive MERN-stack application designed to 
 
 ---
 
-## 🏆 Key Features for Hackathon Judges
+## 🏆 Key Features
 
 ### 🧠 Intelligent AI Core & Robust Resilience
 - **Gemini 1.5/2.0 Integration:** Deep analysis of resume text mapping skill alignments, candidates' top strengths, and growth recommendations.
@@ -48,55 +48,3 @@ graph TD
 ```
 
 ---
-
-## 🚀 How to Run Locally
-
-### 1. Prerequisites
-- Node.js (version 18 or above)
-- MongoDB running locally or a MongoDB Atlas connection string
-
-### 2. Configure Environment Variables
-Create a file named `.env` in the `backend/` directory:
-```env
-PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/talentai
-JWT_SECRET=supersecretjwtkey
-GEMINI_API_KEY=your_gemini_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key (Optional)
-```
-
-### 3. Install & Start Development Servers
-From the root directory:
-
-**Install all dependencies:**
-```bash
-npm run install-backend && npm run install-frontend
-```
-
-**Run Backend Server:**
-```bash
-npm run dev --prefix backend
-```
-
-**Run Frontend Client:**
-```bash
-npm run dev --prefix frontend
-```
-The app will be accessible at `http://localhost:5173`.
-
----
-
-## ☁️ Deployment (Single Web Service on Render)
-
-This application is fully optimized to run on **Render** under a single web service, eliminating CORS issues and reducing hosting costs.
-
-1. Create a new **Web Service** on Render and link your fork/repo.
-2. Configure settings:
-   - **Build Command:** `npm run build`
-   - **Start Command:** `npm start`
-3. Add environment variables under Render's configuration tab:
-   - `NODE_ENV` = `production`
-   - `MONGO_URI` = `your_atlas_connection_string`
-   - `JWT_SECRET` = `your_secret_key`
-   - `GEMINI_API_KEY` = `your_gemini_key`
-   - `OPENROUTER_API_KEY` = `your_openrouter_key` (Optional)
