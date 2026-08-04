@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { FiMenu, FiX, FiSun, FiMoon, FiBell, FiSettings, FiLogOut, FiAward } from 'react-icons/fi';
@@ -9,9 +9,16 @@ const Navbar = () => {
   const { user, logout, isAuthenticated, isRecruiter, isStudent, isPremium } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+  // Close open menus automatically on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setProfileDropdownOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();

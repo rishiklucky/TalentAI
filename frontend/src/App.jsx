@@ -50,10 +50,29 @@ const RoleRoute = ({ children, allowedRoles }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return allowedRoles.includes(user?.role) ? children : <Navigate to="/" />;
+  return allowedRoles.includes(user?.role) ? children : <Navigate to="/" replace />;
+};
+
+// Guest-only Route Wrapper (redirects authenticated users to their dashboard)
+const GuestRoute = ({ children }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-slate-950">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={user?.role === 'recruiter' ? '/recruiter' : '/dashboard'} replace />;
+  }
+
+  return children;
 };
 
 function AppContent() {
@@ -72,10 +91,24 @@ function AppContent() {
         theme="colored"
       />
       <Routes>
-        {/* Public Routes */}
+        {/* Public / Guest Routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route 
+          path="/login" 
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          } 
+        />
 
         {/* Student/Candidate Protected Routes */}
         <Route 
