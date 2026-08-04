@@ -106,19 +106,12 @@ const Sidebar = () => {
         )}
         <a 
           href="#" 
-          className="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-all text-sm"
+          className="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-all text-sm font-medium"
           onClick={(e) => e.preventDefault()}
         >
           <FiHelpCircle className="text-lg" />
           <span>Help Center</span>
         </a>
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant dark:text-slate-400 hover:text-error transition-all text-sm text-left"
-        >
-          <FiLogOut className="text-lg text-error" />
-          <span className="text-error">Sign Out</span>
-        </button>
       </div>
 
       <PremiumUpgradeModal 

@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { FiMenu, FiX, FiSun, FiMoon, FiBell, FiSettings, FiLogOut, FiAward } from 'react-icons/fi';
+import { 
+  FiMenu, FiX, FiSun, FiMoon, FiBell, FiSettings, FiLogOut, FiAward,
+  FiGrid, FiUsers, FiHeart, FiBarChart2, FiUploadCloud, FiUser, FiCpu, FiCompass, FiHelpCircle, FiLock
+} from 'react-icons/fi';
 import PremiumUpgradeModal from './PremiumUpgradeModal';
 
 const Navbar = () => {
@@ -13,12 +16,46 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Close open menus automatically on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileDropdownOpen(false);
   }, [location.pathname]);
+
+  // Click outside listener for user profile dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleProfileDropdown = () => {
+    if (!profileDropdownOpen) {
+      setMobileMenuOpen(false);
+    }
+    setProfileDropdownOpen(!profileDropdownOpen);
+  };
+
+  const handleAvatarClick = () => {
+    if (window.innerWidth < 768) {
+      toggleMobileMenu();
+    } else {
+      toggleProfileDropdown();
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    if (!mobileMenuOpen) {
+      setProfileDropdownOpen(false);
+    }
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   const handleLogout = () => {
     logout();
@@ -30,6 +67,26 @@ const Navbar = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const recruiterLinks = [
+    { name: 'Dashboard', path: '/recruiter', icon: <FiGrid /> },
+    { name: 'Candidates', path: '/candidates', icon: <FiUsers /> },
+    { name: 'Shortlisted', path: '/shortlisted', icon: <FiHeart /> },
+    { name: 'Analytics', path: '/analytics', icon: <FiBarChart2 /> },
+    { name: 'Job Matching', path: '/job-matching', icon: <FiCpu />, premium: true },
+    { name: 'Candidate Comparison', path: '/candidate-comparison', icon: <FiBarChart2 />, premium: true },
+    { name: 'Settings', path: '/settings', icon: <FiSettings /> },
+  ];
+
+  const studentLinks = [
+    { name: 'My Profile', path: '/dashboard', icon: <FiUser /> },
+    { name: 'Upload Resume', path: '/upload', icon: <FiUploadCloud /> },
+    { name: 'Resume Optimizer', path: '/resume-optimizer', icon: <FiCpu />, premium: true },
+    { name: 'Career Roadmap', path: '/career-roadmap', icon: <FiCompass />, premium: true },
+    { name: 'Settings', path: '/settings', icon: <FiSettings /> },
+  ];
+
+  const mobileNavLinks = isRecruiter ? recruiterLinks : studentLinks;
+
   return (
     <>
       <nav className="bg-surface/70 dark:bg-slate-900/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm sticky top-0 z-50 transition-all duration-300">
@@ -40,34 +97,6 @@ const Navbar = () => {
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">
             TalentAI
           </Link>
-          
-          {/* Desktop Nav Links */}
-          {isAuthenticated && (
-            <div className="hidden md:flex items-center gap-stack-md ml-stack-lg">
-              {isRecruiter ? (
-                <>
-                  <NavLink to="/candidates" className={({ isActive }) => `font-label-caps text-label-caps uppercase pb-1 transition-colors ${isActive ? 'text-primary dark:text-primary-fixed border-b-2 border-primary' : 'text-on-surface-variant dark:text-slate-400 hover:text-primary'}`}>
-                    Discover
-                  </NavLink>
-                  <NavLink to="/shortlisted" className={({ isActive }) => `font-label-caps text-label-caps uppercase pb-1 transition-colors ${isActive ? 'text-primary dark:text-primary-fixed border-b-2 border-primary' : 'text-on-surface-variant dark:text-slate-400 hover:text-primary'}`}>
-                    Shortlisted
-                  </NavLink>
-                  <NavLink to="/analytics" className={({ isActive }) => `font-label-caps text-label-caps uppercase pb-1 transition-colors ${isActive ? 'text-primary dark:text-primary-fixed border-b-2 border-primary' : 'text-on-surface-variant dark:text-slate-400 hover:text-primary'}`}>
-                    Analytics
-                  </NavLink>
-                </>
-              ) : (
-                <>
-                  <NavLink to="/dashboard" className={({ isActive }) => `font-label-caps text-label-caps uppercase pb-1 transition-colors ${isActive ? 'text-primary dark:text-primary-fixed border-b-2 border-primary' : 'text-on-surface-variant dark:text-slate-400 hover:text-primary'}`}>
-                    My Profile
-                  </NavLink>
-                  <NavLink to="/upload" className={({ isActive }) => `font-label-caps text-label-caps uppercase pb-1 transition-colors ${isActive ? 'text-primary dark:text-primary-fixed border-b-2 border-primary' : 'text-on-surface-variant dark:text-slate-400 hover:text-primary'}`}>
-                    Upload Resume
-                  </NavLink>
-                </>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Right side buttons */}
@@ -88,15 +117,10 @@ const Navbar = () => {
                 <FiBell className="text-xl" />
               </button>
 
-              {/* Settings Icon */}
-              <Link to="/settings" className="p-2 rounded-full hover:bg-primary/5 text-outline dark:text-slate-400 hover:text-primary transition-all">
-                <FiSettings className="text-xl" />
-              </Link>
-
               {/* User Dropdown */}
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button 
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  onClick={handleAvatarClick}
                   className="flex items-center gap-2 focus:outline-none"
                 >
                   <div className="relative">
@@ -143,19 +167,12 @@ const Navbar = () => {
                       </button>
                     )}
 
-                    <Link 
-                      to={isRecruiter ? "/recruiter" : "/dashboard"} 
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-low dark:hover:bg-slate-700 transition-colors"
-                    >
-                      Dashboard
-                    </Link>
                     <button 
                       onClick={() => {
                         setProfileDropdownOpen(false);
                         handleLogout();
                       }}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error-container/10 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error-container/10 transition-colors text-left font-semibold"
                     >
                       <FiLogOut /> Sign Out
                     </button>
@@ -176,7 +193,7 @@ const Navbar = () => {
 
           {/* Mobile menu trigger */}
           <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={toggleMobileMenu}
             className="md:hidden p-2 rounded-full text-outline dark:text-slate-400"
           >
             {mobileMenuOpen ? <FiX className="text-2xl" /> : <FiMenu className="text-2xl" />}
@@ -184,33 +201,97 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-outline-variant/30 py-4 px-margin-mobile flex flex-col gap-4 shadow-inner">
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-outline-variant/30 py-4 px-margin-mobile flex flex-col gap-3 shadow-xl max-h-[85vh] overflow-y-auto">
           {isAuthenticated ? (
             <>
-              {isRecruiter ? (
-                <>
-                  <Link to="/candidates" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">Discover</Link>
-                  <Link to="/shortlisted" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">Shortlisted</Link>
-                  <Link to="/analytics" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">Analytics</Link>
-                </>
-              ) : (
-                <>
-                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">My Profile</Link>
-                  <Link to="/upload" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">Upload Resume</Link>
-                </>
-              )}
-              <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="text-on-surface-variant dark:text-slate-300 hover:text-primary font-semibold">Settings</Link>
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="text-error font-semibold flex items-center gap-2 text-left"
-              >
-                <FiLogOut /> Sign Out
-              </button>
+              {/* Portal Header Card */}
+              <div className="flex items-center gap-3 p-3 bg-surface-container-low dark:bg-slate-800 rounded-xl mb-1">
+                <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md text-white text-xl flex-shrink-0">
+                  {isRecruiter ? <FiUsers /> : <FiUser />}
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-headline-sm text-sm font-extrabold text-primary dark:text-inverse-primary leading-none truncate">
+                    {isRecruiter ? 'Recruiter Portal' : 'Student Portal'}
+                  </h2>
+                  <p className="text-[10px] font-label-caps text-outline dark:text-slate-400 uppercase tracking-widest mt-1">
+                    {isPremium ? 'PREMIUM TIER' : 'TALENT POOL'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="flex flex-col gap-1">
+                {mobileNavLinks.map((link) => {
+                  const isLocked = link.premium && !isPremium;
+
+                  if (isLocked) {
+                    return (
+                      <button
+                        key={link.path}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setUpgradeModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-md text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-800 text-left transition-all"
+                      >
+                        <span className="text-lg text-outline">{link.icon}</span>
+                        <span className="font-medium text-sm">{link.name}</span>
+                        <span className="ml-auto text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold font-label-caps">
+                          <FiLock className="text-[10px]" /> PRO
+                        </span>
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <NavLink
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-md transition-all ${
+                        isActive 
+                          ? 'bg-primary/5 dark:bg-primary-container/20 text-primary dark:text-primary-fixed-dim font-bold border-l-4 border-primary' 
+                          : 'text-on-surface-variant dark:text-slate-300 hover:bg-surface-container-high dark:hover:bg-slate-800 font-medium text-sm'
+                      }`}
+                    >
+                      <span className="text-lg">{link.icon}</span>
+                      <span>{link.name}</span>
+                      {link.premium && (
+                        <span className="ml-auto text-[10px] bg-gradient-primary text-white px-1.5 py-0.5 rounded flex items-center gap-1 font-bold font-label-caps shadow-sm">
+                          PRO
+                        </span>
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
+
+              {/* Bottom Footer Actions */}
+              <div className="border-t border-outline-variant/20 pt-2 mt-1 flex flex-col gap-1">
+                <a 
+                  href="#" 
+                  className="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-all text-sm font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FiHelpCircle className="text-lg" />
+                  <span>Help Center</span>
+                </a>
+                <button 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex items-center gap-3 px-3 py-2 text-error hover:bg-error-container/10 transition-all text-sm font-semibold text-left rounded-lg"
+                >
+                  <FiLogOut className="text-lg text-error" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </>
           ) : (
             <div className="flex flex-col gap-2">
